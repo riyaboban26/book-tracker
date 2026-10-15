@@ -116,9 +116,9 @@ body {
 /* Container */
 .container {
   width: 100%;
-  max-width: 1120px;
+  max-width: 1320px;
   margin: 0 auto;
-  padding: 0 1.25rem;
+  padding: 0 1.5rem;
 }
 
 /* Screen Reader Only Utility */
@@ -270,6 +270,24 @@ body {
   transition: box-shadow var(--transition-normal), border-color var(--transition-normal);
 }
 
+/* Two-Column Workspace Layout (Sidebar + Main Library) */
+.workspace-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.sidebar-column {
+  position: sticky;
+  top: 5.5rem;
+  z-index: 20;
+}
+
+.main-column {
+  min-width: 0;
+}
+
 /* --------------------------------------------------------------------------
    6. Statistics Summary Section
    -------------------------------------------------------------------------- */
@@ -351,12 +369,12 @@ body {
    7. Add Book Section & Form
    -------------------------------------------------------------------------- */
 .add-book-card {
-  padding: 1.75rem 2rem;
+  padding: 1.5rem;
   border-top: 4px solid var(--primary-forest);
 }
 
 .card-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .card-title {
@@ -364,22 +382,23 @@ body {
   align-items: center;
   gap: 0.625rem;
   font-family: var(--font-serif);
-  font-size: 1.375rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--primary-forest);
   margin-bottom: 0.25rem;
 }
 
 .card-subtitle {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: var(--text-muted);
+  line-height: 1.4;
 }
 
 .form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 180px;
-  gap: 1.25rem;
-  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .form-group {
@@ -387,12 +406,36 @@ body {
   flex-direction: column;
 }
 
+.form-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+}
+
 .form-label {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--text-main);
-  margin-bottom: 0.5rem;
   display: inline-block;
+}
+
+.char-count {
+  font-size: 0.75rem;
+  color: var(--text-subtle);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  transition: color var(--transition-fast);
+}
+
+.char-count.char-count-warn {
+  color: #b45309;
+  font-weight: 600;
+}
+
+.char-count.char-count-max {
+  color: var(--danger-red);
+  font-weight: 700;
 }
 
 .required-indicator {
@@ -471,7 +514,10 @@ body {
 
 .form-actions {
   display: flex;
-  justify-content: flex-end;
+}
+
+.btn-block {
+  width: 100%;
 }
 
 /* --------------------------------------------------------------------------
@@ -680,7 +726,7 @@ body {
    -------------------------------------------------------------------------- */
 .book-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.25rem;
 }
 
@@ -719,6 +765,10 @@ body {
   line-height: 1.35;
   word-break: break-word;
   overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .book-author {
@@ -1081,18 +1131,19 @@ body {
 /* --------------------------------------------------------------------------
    15. Responsive Media Queries
    -------------------------------------------------------------------------- */
-/* Tablets and smaller screens */
-@media (max-width: 900px) {
+/* Tablets and medium screens */
+@media (max-width: 1024px) {
+  .workspace-grid {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+
+  .sidebar-column {
+    position: static;
+  }
+
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .form-group:nth-child(3) {
-    grid-column: span 2;
   }
 }
 

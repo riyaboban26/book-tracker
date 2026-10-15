@@ -21,6 +21,7 @@
   // ==========================================================================
 
   const STORAGE_KEY = 'booktracker_library';
+  const MAX_TITLE_LENGTH = 100;
 
   /**
    * Application state
@@ -57,6 +58,7 @@
     bookStatusSelect: document.getElementById('book-status'),
     titleError: document.getElementById('title-error'),
     authorError: document.getElementById('author-error'),
+    titleCharCount: document.getElementById('title-char-count'),
     btnAddBook: document.getElementById('btn-add-book'),
 
     // Search and Filters
@@ -278,6 +280,9 @@
     if (!titleVal) {
       setFieldError(elements.bookTitleInput, elements.titleError, 'Please enter a title');
       isValid = false;
+    } else if (titleVal.length > MAX_TITLE_LENGTH) {
+      setFieldError(elements.bookTitleInput, elements.titleError, `Title is too long (maximum ${MAX_TITLE_LENGTH} characters)`);
+      isValid = false;
     } else {
       clearFieldError(elements.bookTitleInput, elements.titleError);
     }
@@ -322,6 +327,10 @@
     // Reset Form
     elements.addBookForm.reset();
     elements.bookStatusSelect.value = 'To read';
+    if (elements.titleCharCount) {
+      elements.titleCharCount.textContent = `0/${MAX_TITLE_LENGTH}`;
+      elements.titleCharCount.classList.remove('char-count-warn', 'char-count-max');
+    }
     clearFieldError(elements.bookTitleInput, elements.titleError);
     clearFieldError(elements.bookAuthorInput, elements.authorError);
 
@@ -392,6 +401,7 @@
     const titleEl = document.createElement('h3');
     titleEl.className = 'book-title';
     titleEl.textContent = book.title; // Safe textContent
+    titleEl.title = book.title; // Accessible tooltip on hover
 
     const statusBadge = document.createElement('span');
     const badgeMeta = getStatusBadgeMeta(book.status);
@@ -618,13 +628,14 @@
 
     const descEl = document.createElement('p');
     descEl.className = 'empty-state-desc';
-    descEl.textContent = 'Add your first book using the form above to start tracking your reading progress and habits.';
+    descEl.textContent = 'Add your first book using the form on the left to start tracking your reading progress and habits.';
 
     const actionBtn = document.createElement('button');
     actionBtn.type = 'button';
     actionBtn.className = 'btn btn-secondary empty-state-action';
     actionBtn.textContent = 'Add a Book Now';
     actionBtn.addEventListener('click', () => {
+      elements.bookTitleInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
       elements.bookTitleInput.focus();
     });
 
@@ -868,10 +879,20 @@
     // Add Book Form
     elements.addBookForm.addEventListener('submit', handleAddBookFormSubmit);
 
-    // Live input error clearing as user types
+    // Live input error clearing and character count tracking
     elements.bookTitleInput.addEventListener('input', function () {
-      if (elements.bookTitleInput.value.trim().length > 0) {
+      const currentLen = elements.bookTitleInput.value.length;
+      if (elements.titleCharCount) {
+        elements.titleCharCount.textContent = `${currentLen}/${MAX_TITLE_LENGTH}`;
+        elements.titleCharCount.classList.toggle('char-count-warn', currentLen >= 80 && currentLen < MAX_TITLE_LENGTH);
+        elements.titleCharCount.classList.toggle('char-count-max', currentLen >= MAX_TITLE_LENGTH);
+      }
+
+      const trimmedVal = elements.bookTitleInput.value.trim();
+      if (trimmedVal.length > 0 && trimmedVal.length <= MAX_TITLE_LENGTH) {
         clearFieldError(elements.bookTitleInput, elements.titleError);
+      } else if (trimmedVal.length > MAX_TITLE_LENGTH) {
+        setFieldError(elements.bookTitleInput, elements.titleError, `Title cannot exceed ${MAX_TITLE_LENGTH} characters`);
       }
     });
 
