@@ -1,87 +1,104 @@
 # BookTracker 📚
 
-A clean, modern, and beginner-friendly personal reading dashboard built with pure HTML5, CSS3, and Vanilla JavaScript. **BookTracker** allows users to organize their personal library, monitor their reading progress, filter and search through books, and securely preserve their reading history across browser sessions using `localStorage`.
+A modern, responsive personal reading dashboard built with pure **HTML5**, **CSS3**, and **Vanilla JavaScript**. **BookTracker** allows book lovers to organize their personal reading collection, track reading progress in real time, quickly search and filter titles, and securely persist reading history across browser sessions using `localStorage`—all with zero external frameworks or dependencies.
 
 ---
 
-## 🌟 Overview & Design Aesthetic
+## 🌟 Overview & Architecture
 
-BookTracker is designed around the visual metaphor of a quiet, warm personal study.
-- **Color Palette**: Calming soft cream (`#F8F6F0`) canvas with a deep forest green (`#1B4332`) primary accent, complemented by warm amber, sage, and slate tones for status badges.
-- **Typography**: Clean, readable typography pairing `Plus Jakarta Sans` for responsive UI controls with `Playfair Display` for refined editorial headings.
-- **Aesthetic Elements**: Soft elevation shadows, subtle border lines, rounded cards (`border-radius: 16px`), micro-interactions on hover/focus, and accessible modal confirmation dialogs.
+BookTracker is built around the aesthetic of a quiet, warm personal library study, combining refined typography with an intuitive desktop and mobile dashboard layout.
+
+### Layout Design
+- **Two-Column Workspace (`workspace-grid`)**:
+  - **Sticky Left Sidebar (`sidebar-column`)**: Houses the **"Add a New Book"** form with real-time character counting, inline validation, and status selection. Stays anchored on screen as users scroll through their collection.
+  - **Main Library Area (`main-column`)**: Gives primary focus to the reading collection, featuring live search, status filter pills, dynamic result counters, and a multi-column responsive book card grid.
+- **Top Statistics Overview**: An elevated four-metric summary bar displaying live counters for *Total Books*, *To Read*, *Reading*, and *Finished*.
+- **Color System**: Soft cream canvas (`#F8F6F0`) paired with deep forest green accents (`#1B4332`), warm emerald (`#2D6A4F`), amber, and slate status indicators.
+- **Typography**: Editorial serif headings (`Playfair Display`) paired with clean, legible geometric sans-serif UI controls (`Plus Jakarta Sans`).
 
 ---
 
-## ✨ Features
+## ✨ Features & Implementation Details
 
-### 1. Add New Books
-- Required fields for **Book Title** and **Author Name**.
-- Dropdown selector for **Reading Status** with three options: `To read`, `Reading`, and `Finished` (defaults to `To read`).
-- Inline real-time validation:
-  - Displays *"Please enter a title"* if the title field is blank or contains only whitespace.
-  - Displays *"Please enter an author"* if the author field is blank or contains only whitespace.
-  - Automatically clears validation error messages as soon as the user resumes typing.
-- Leading and trailing whitespace is automatically trimmed.
-- New books are automatically assigned a unique ID (`crypto.randomUUID()` with fallback) and a creation timestamp.
-- Newly added books are placed at the **top** of the list (newest first).
-- Instant, non-intrusive toast notification confirms successful addition.
+### 1. Add New Books with Real-Time Validation & Character Limits
+- **Required Fields**: Book Title and Author Name.
+- **Reading Status Selector**: Dropdown options for `To read`, `Reading`, and `Finished` (defaults to `To read`).
+- **Character Limit Guard**:
+  - Book titles are capped at a maximum of **100 characters** via `maxlength="100"` and JavaScript submission validation.
+  - **Live Character Counter (`0/100`)**: Displays active character count beside the label, dynamically shifting to amber at 80+ characters and red at the 100-character ceiling.
+- **Inline Error Feedback**:
+  - Displays *"Please enter a title"* if the title field is blank or only whitespace.
+  - Displays *"Please enter an author"* if the author field is blank or only whitespace.
+  - Displays *"Title is too long (maximum 100 characters)"* if boundary limits are breached.
+  - Clears error messages automatically as soon as the user resumes typing.
+- **Sanitization & Ordering**:
+  - Automatically trims leading and trailing whitespace.
+  - Generates unique record IDs via `crypto.randomUUID()` (with timestamp-random fallback).
+  - Prepends newly added books to the top of the collection (newest first).
+  - Displays a non-intrusive toast notification on successful addition.
 
 ### 2. Reading Dashboard Statistics
-Dynamic summary cards display real-time counters:
-- **Total Books**: Total count of all books in your library.
+Dynamic summary cards track reading habits across the entire collection:
+- **Total Books**: Cumulative count of all stored books.
 - **To Read**: Books queued for future reading.
 - **Reading**: Books currently in progress.
 - **Finished**: Completed books.
-*Note: Dashboard statistics always reflect your entire library collection, even when active searches or filters are applied.*
+*Note: Dashboard statistics reflect the complete saved collection, remaining consistent even when temporary search queries or filter pills are applied.*
 
-### 3. Display & Card Management
-- Each book is presented in an elevated card showing title, author, reading status badge, date added, a quick status dropdown, and a delete button.
-- Handles exceptionally long titles and author names with CSS word wrapping (`break-word` / `overflow-wrap`) without disrupting card alignment.
-- Visual status badges:
-  - 🔵 **To Read** (Soft blue / slate badge)
+### 3. Card Management & Multi-Line Clamping
+- Each book is rendered in an elevated card showing title, author, visual status badge, date added, a quick-change status dropdown, and a delete button.
+- **Visual Status Badges**:
+  - 🔵 **To Read** (Slate blue badge)
   - 🟡 **Reading** (Warm amber badge)
   - 🟢 **Finished** (Lush forest green badge)
+- **Title Overflow Protection**: Book titles wrap cleanly and use CSS multi-line clamping (`-webkit-line-clamp: 3`) to ensure long titles never distort card geometry. An accessible HTML `title` tooltip allows inspecting the complete title on hover.
 
-### 4. Live Search
-- Search through books by **Title** or **Author Name**.
-- Case-insensitive (e.g., searching `"BEN"` finds *"Goat Days"* by *"Benyamin"*).
-- Instant live filtering as you type.
-- Integrated clear button (`✕`) appears when typing, allowing one-click query clearing.
-- Works in tandem with status filters.
+### 4. Instant Live Search
+- Search across books by **Title** or **Author Name**.
+- Case-insensitive matching (e.g., searching `"BEN"` matches *"Goat Days"* by *"Benyamin"*).
+- Instant filtering on every keystroke with no search button required.
+- Integrated one-click clear button (`✕`) appears while typing.
+- Fully compatible with active status filters.
 
 ### 5. Status Filtering
-- Filter tabs: **All Books**, **To Read**, **Reading**, **Finished**.
-- Selected filter is visually highlighted with a solid forest green pill.
-- Seamlessly combines with search queries.
-- Clearing or resetting search keeps the currently selected status filter active.
+- Segmented filter pills: **All Books**, **To Read**, **Reading**, and **Finished**.
+- Active filter pill is highlighted with an emerald badge and `aria-checked="true"`.
+- Combines seamlessly with active search queries.
+- Clearing the search box preserves the currently selected status filter.
 
-### 6. Update Reading Status
-- Change any book's status on-the-fly using the card dropdown selector.
-- Updates the card badge, dashboard counts, and browser storage immediately.
+### 6. Quick Status Updating
+- Change any book's status on the fly using the dropdown selector on its card.
+- Instantly updates card badges, dashboard summary counters, and persistent storage.
+- Shows a confirmation toast notification upon status change.
 
-### 7. Delete Books with Confirmation Dialog
-- Clicking "Delete" displays an accessible modal dialog preventing accidental removals.
-- Features keyboard accessibility (supports Escape key dismiss and focus trap).
-- Clicking "Yes, Delete Book" removes the item, updates counts, and displays a confirmation toast.
+### 7. Delete Confirmation Dialog
+- Clicking "Delete" opens a confirmation modal dialog (`role="dialog"`, `aria-modal="true"`) to prevent accidental data loss.
+- Displays the specific book title to confirm removal.
+- **Keyboard & Focus Handling**:
+  - Closes on `Escape` key press or when clicking the backdrop overlay.
+  - Sets initial focus on the "Cancel" button to prevent accidental trigger on `Enter`.
+  - Restores focus to the triggering delete button upon dialog dismissal.
+- Clicking "Yes, Delete Book" removes the item, updates dashboard statistics, and displays a toast message.
 
-### 8. Empty States
-- **Empty Library**: Helpful message and quick-action button when no books have been added yet.
-- **No Search/Filter Results**: Clear explanation when no books match the active query/filter with a single-click "Clear Filters & Search" button.
+### 8. Context-Aware Empty States
+- **Empty Library**: Friendly message and an "Add a Book Now" button that scrolls and focuses the title input in the sidebar.
+- **No Search/Filter Results**: Explains why no records matched the active filter/query and provides a single-click "Clear Filters & Search" button.
 
-### 9. Security & Accessibility
-- **XSS Prevention**: Safe DOM construction using `document.createElement` and `textContent`. User input is never injected into `innerHTML`.
-- **Keyboard Navigation**: Complete keyboard accessibility with visible `:focus-visible` outline rings.
-- **Screen Reader Support**: Accessible ARIA labels (`aria-label`, `aria-describedby`, `role="radiogroup"`, `role="dialog"`).
+### 9. Security & Accessibility (a11y)
+- **XSS Prevention**: DOM elements are constructed using `document.createElement`, `textContent`, and safe DOM node appending. Raw user input is never parsed through `innerHTML`.
+- **Keyboard Navigation**: Interactive controls include visible `:focus-visible` outline rings for keyboard navigation.
+- **ARIA Standards**: Utilizes semantic roles and attributes including `role="dialog"`, `role="radiogroup"`, `role="radio"`, `role="alert"`, `aria-live`, and `aria-describedby`.
 
 ---
 
-## 🛠️ Technologies Used
+## 🛠️ Technology Stack
 
-- **HTML5**: Semantic elements (`<header>`, `<main>`, `<section>`, `<article>`, `<footer>`, `<aside>`, `<dialog>`).
-- **CSS3**: Custom properties (CSS variables), CSS Grid, Flexbox, media queries for responsive layouts, subtle animations. No CSS frameworks used.
-- **Vanilla JavaScript (ES6+)**: Clean, modular code, event delegation, DOM manipulation, state management. No libraries or frameworks used.
-- **Browser localStorage**: Native client-side key-value storage for offline persistence.
+| Technology | Implementation Scope |
+| :--- | :--- |
+| **HTML5** | Semantic structure using `<header>`, `<main>`, `<section>`, `<article>`, `<aside>`, `<footer>`, form controls, and accessible ARIA attributes. |
+| **CSS3** | Vanilla CSS using custom properties (CSS variables), CSS Grid (2-column workspace & auto-fill card grid), Flexbox, sticky positioning, line clamping, and responsive media queries. Zero CSS frameworks. |
+| **JavaScript (ES6+)** | Pure Vanilla JavaScript encapsulated in an IIFE (`'use strict'`), reactive state management, DOM event listeners, and safe node creation. Zero external dependencies. |
+| **Web Storage API** | Browser `localStorage` for offline-first persistence with storage availability detection and graceful fallbacks. |
 
 ---
 
@@ -90,108 +107,115 @@ Dynamic summary cards display real-time counters:
 ```text
 book-tracker/
 │
-├── index.html        # Semantic page structure, forms, templates, accessible modal
-├── style.css         # Modern design system, CSS variables, responsive layout
-├── app.js            # Vanilla JavaScript logic, state, storage, search, filter
+├── index.html        # Semantic markup, sidebar form, library grid, modal markup
+├── style.css         # Design system tokens, sidebar layout, responsive breakpoints
+├── app.js            # State management, validation, DOM rendering, localStorage logic
 ├── README.md         # Comprehensive project documentation
-└── PROMPTS.md        # AI prompt logs, testing history, and development notes
+└── PROMPTS.md        # AI prompt logs, development history, and iteration records
 ```
 
 ---
 
-## 🚀 Instructions for Running Locally
+## 🚀 How to Run Locally
 
-Because BookTracker uses standard static web technologies with no build steps or backend servers, you can run it in multiple ways:
+Because BookTracker is built with native web standards with no build tools or package managers required, you can launch it using any of the following methods:
 
-### Option 1: Direct Browser Launch
-1. Clone or download this repository to your local machine.
-2. Locate `index.html` in the project root folder.
-3. Double-click `index.html` (or right-click and choose **Open with** > **Google Chrome**, **Mozilla Firefox**, **Microsoft Edge**, or **Safari**).
+### Method 1: Direct File Launch (Fastest)
+1. Clone or download this repository.
+2. Locate `index.html` in your file explorer.
+3. Double-click `index.html` to open it directly in any modern browser (Chrome, Edge, Firefox, Safari).
+   - *Windows PowerShell shortcut*:
+     ```powershell
+     Start-Process "index.html"
+     ```
 
-### Option 2: Using Python's Built-in HTTP Server (Recommended)
-1. Open your terminal or PowerShell.
-2. Navigate to the project root directory:
-   ```bash
-   cd path/to/book-tracker
-   ```
-3. Start the local server:
+### Method 2: Python Local HTTP Server (Recommended)
+1. Open terminal or PowerShell in the project directory.
+2. Run Python's built-in server:
    ```bash
    python -m http.server 8080
    ```
-4. Open your browser and navigate to:
+3. Open your browser and navigate to:
    ```text
    http://localhost:8080
    ```
 
-### Option 3: Using Node.js `npx serve`
+### Method 3: Node.js (`npx serve`)
+If you have Node.js installed, start a lightweight static server:
 ```bash
 npx serve .
 ```
 
+### Method 4: VS Code Live Server
+1. Open the project folder in VS Code.
+2. Right-click `index.html` in the Explorer pane.
+3. Select **Open with Live Server**.
+
 ---
 
-## 💾 Understanding `localStorage`
+## 💾 Understanding `localStorage` Persistence
 
-### How It Works
-`localStorage` is a native web browser API that stores key-value pairs locally on the user's computer. In BookTracker:
-- Books are serialized into a JSON string and saved under the key:
+### How Data is Stored
+- Book items are stored as a serialized JSON array under the key `'booktracker_library'`:
   ```javascript
-  localStorage.setItem('booktracker_library', JSON.stringify(books));
+  localStorage.setItem('booktracker_library', JSON.stringify(state.books));
   ```
-- When the page is refreshed or reopened, the stored string is parsed back into JavaScript objects:
+- On initial page load, the stored string is parsed and validated:
   ```javascript
-  const books = JSON.parse(localStorage.getItem('booktracker_library'));
+  const saved = JSON.parse(localStorage.getItem('booktracker_library'));
   ```
 
 ### Storage Characteristics
-- **Persistence**: Data remains saved even after closing the tab, quitting the browser, or rebooting your computer.
-- **Browser-Specific**: Data is tied to the specific browser and profile where it was entered (e.g., books added in Chrome will not automatically show up in Firefox).
-- **Domain-Specific**: Data is scoped to the specific protocol and origin (`localhost:8080` or your GitHub Pages URL).
-- **No Cloud Synchronization**: Data is stored strictly on your local machine and is not synchronized across multiple computers or mobile phones.
-- **Availability Warning**: If `localStorage` is disabled (such as certain private browsing modes or restricted enterprise environments), BookTracker displays a top banner informing the user that data will only persist for the current session.
+- **Persistence**: Saved books persist across tab closures, browser restarts, and system reboots.
+- **Domain & Browser Scoped**: Data is scoped to the specific browser profile and origin (`localhost` or GitHub Pages domain).
+- **Graceful Error Handling**: If a user's browser disables storage (such as strict private browsing or disabled cookies), an accessibility warning banner is shown at the top of the page notifying them that data will persist for the active session only.
 
 ---
 
-## 🌐 Publishing to GitHub Pages (Free Hosting)
+## 🌐 Deploying to GitHub Pages
 
-Follow these steps to deploy BookTracker for free on GitHub Pages:
+BookTracker can be hosted for free on GitHub Pages with zero build configuration:
 
-### Step 1: Create a GitHub Repository
-1. Log in to [GitHub](https://github.com/).
-2. In the top-right corner, click **+** and select **New repository**.
-3. Name your repository (e.g., `book-tracker`).
-4. Keep the repository **Public**.
-5. Do not initialize with a README if you are pushing existing files.
-6. Click **Create repository**.
-
-### Step 2: Push Local Files to GitHub
-In your local project folder, run the following commands:
+### Step 1: Push Code to GitHub
 ```bash
 git init
 git add .
-git commit -m "Initial commit: Complete BookTracker application"
+git commit -m "Complete BookTracker application"
 git branch -M main
-git remote add origin https://github.com/<YOUR-USERNAME>/book-tracker.git
+git remote add origin https://github.com/riyaboban26/book-tracker.git
 git push -u origin main
 ```
-*(Replace `<YOUR-USERNAME>` with your actual GitHub username).*
 
-### Step 3: Enable GitHub Pages
+### Step 2: Enable GitHub Pages
 1. On GitHub, navigate to your repository's **Settings** tab.
-2. In the left sidebar, click **Pages** (under the "Code and automation" section).
+2. In the left navigation menu, click **Pages** (under *Code and automation*).
 3. Under **Build and deployment** > **Branch**:
-   - Select `main` from the dropdown branch menu.
-   - Leave the folder set to `/(root)`.
+   - Choose `main` from the branch dropdown.
+   - Ensure the folder is set to `/(root)`.
    - Click **Save**.
-4. Wait 1–2 minutes. Refresh the page to see your live site link:
+4. Allow 1–2 minutes for GitHub to publish the site. Your live deployment will be accessible at:
    ```text
-   https://<YOUR-USERNAME>.github.io/book-tracker/
+   https://riyaboban26.github.io/book-tracker/
    ```
 
 ---
 
-## ⚠️ Known Limitations
+## 🔍 Engineering Considerations & Limitations
 
-1. **Client-Side Scope**: Because there is no external database or user authentication, your reading list cannot be shared directly with friends via a link or synced between your desktop and smartphone.
-2. **Storage Quota**: Browser `localStorage` typically has a storage quota of approximately 5MB per domain. For text-based book records, this easily accommodates thousands of titles, but cannot store high-resolution book cover images directly.
-3. **Private Browsing Mode**: In some browsers operating in strict incognito or private browsing modes, `localStorage` data may be wiped once all private windows are closed.
+1. **Client-Side Storage Scope**: Data is stored in client-side `localStorage`, meaning reading lists are private to the user's specific browser and do not sync across different physical devices without an external cloud backend.
+2. **Storage Quota**: Browser `localStorage` typically provides ~5MB of storage per origin. For text-based book records, this easily accommodates thousands of titles, but is not designed for binary data or raw image files.
+3. **Private Browsing Lifecycles**: In strict incognito or private browsing sessions, browsers wipe `localStorage` caches once all private session windows close.
+
+---
+
+## 🧪 Verification & Manual Testing Scenarios
+
+The following scenarios were manually validated across desktop and mobile viewports:
+- [x] **Empty Input Validation**: Submitting without title or author displays corresponding inline error messages.
+- [x] **Character Length Ceiling**: Verifying typing and pasting up to 100 characters; live counter updates, shifts to warning color at 80+, and enforces hard stop at 100 characters.
+- [x] **Whitespace Handling**: Entries with extraneous spaces are trimmed cleanly.
+- [x] **Two-Column Layout & Sticky Sidebar**: Verifying form sticks during scrolling on desktop (screens ≥ 1024px) and collapses gracefully into a stacked layout on tablets and mobile screens.
+- [x] **Search & Filter Concurrency**: Searching for partial strings (case-insensitive) while a status filter is selected filters correctly without clearing the active filter.
+- [x] **Status Progression**: Updating status via card dropdown updates the badge color, summary cards, and storage in real time.
+- [x] **Delete Confirmation**: Deleting a book prompts modal confirmation; Escape key or Cancel button cancels without deletion; confirming removes record and updates counters.
+- [x] **Persistence Check**: Refreshing (`F5`) or reopening the browser retains all records and status counts intact.
